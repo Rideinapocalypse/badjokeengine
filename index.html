@@ -17,21 +17,22 @@ body {
 }
 
 .card {
-  width: 460px;
+  width: 520px;
   background: #020617;
   border-radius: 18px;
   padding: 30px;
-  box-shadow: 0 25px 60px rgba(0,0,0,.8);
+  box-shadow: 0 30px 70px rgba(0,0,0,.85);
 }
 
 h1 {
   margin: 0;
+  font-size: 26px;
 }
 
 .subtitle {
   font-size: 13px;
   opacity: .7;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
 select, button {
@@ -54,14 +55,20 @@ button:hover {
   background: #dc2626;
 }
 
-.joke {
+.output {
   margin-top: 20px;
-  min-height: 80px;
-  padding: 16px;
+  min-height: 90px;
+  padding: 18px;
   border-radius: 12px;
   background: #000;
-  border: 1px dashed #334155;
+  border-left: 4px solid #334155;
   font-size: 16px;
+}
+
+.output.mail {
+  background: #020617;
+  border-left: 4px solid #22c55e;
+  font-size: 15px;
 }
 
 .reactions button {
@@ -87,7 +94,7 @@ button:hover {
 }
 
 footer {
-  margin-top: 15px;
+  margin-top: 16px;
   font-size: 11px;
   opacity: .5;
   text-align: center;
@@ -121,11 +128,12 @@ footer {
 
 <div class="card">
   <h1>☎️ Bad Joke Engine</h1>
-  <p class="subtitle">For people who survived call centers.</p>
+  <p class="subtitle" id="subtitle">Because alignment is optional.</p>
 
-  <select id="mode">
-    <option value="jokes">🎭 Pain Generator</option>
+  <select id="mode" onchange="updateSubtitle()">
+    <option value="pain">🎭 Pain Generator</option>
     <option value="lies">🏢 Corporate Lies</option>
+    <option value="recognition">🏆 Recognition Engine</option>
   </select>
 
   <select id="role">
@@ -142,29 +150,22 @@ footer {
   <select id="intensity">
     <option value="mild">😐 Mild</option>
     <option value="dark">😈 Dark</option>
-    <option value="apocalypse">☠️ Apocalypse</option>
+    <option value="real">🖤 Real</option>
   </select>
 
-  <button id="actionBtn" onclick="generate()">Hit me with pain</button>
+  <button onclick="generate()">Generate</button>
 
-  <div class="joke" id="output"></div>
+  <div class="output" id="output"></div>
   <div class="streak" id="streak"></div>
 
   <div class="reactions">
     <button onclick="react('Too real')">✅ Too real</button>
     <button onclick="react('I lived this')">😬 I lived this</button>
     <button onclick="react('Who leaked this')">💀 Who leaked this?</button>
-    <button class="copy" onclick="copyText()">📋 Copy for Teams</button>
+    <button class="copy" onclick="copyText()">📋 Copy</button>
   </div>
 
-  <div class="metrics">
-    <strong>📊 Live Metrics</strong><br>
-    Morale: 🔴 Critical<br>
-    Alignment: 🟡 Discussed<br>
-    Action Taken: ❌<br>
-    Meetings About Meetings: 📈<br>
-    Today: 😬 <span id="today"></span> people felt this
-  </div>
+  <div class="metrics" id="dashboard"></div>
 
   <footer>
     Built by people who answered the phone.
@@ -174,116 +175,153 @@ footer {
 <div class="toast" id="toast"></div>
 
 <script>
-const data = {
-  jokes: {
-    agent: {
-      mild: ["Customer says they tried everything. They didn’t."],
-      dark: ["‘Quick call’ detected. Lies confirmed."],
-      apocalypse: ["Customer works in IT. Issue persists."]
-    },
-    qa: {
-      mild: ["Great call. One small thing."],
-      dark: ["QA score 98%. Let’s talk about 2%."],
-      apocalypse: ["Silence was 0.3 seconds too long."]
-    },
-    tm: {
-      mild: ["Let’s align later."],
-      dark: ["Meeting about another meeting."],
-      apocalypse: ["Action plan created. Nothing executed."]
-    },
-    ops: {
-      mild: ["Numbers look fine."],
-      dark: ["Forecast approved. Reality declined."],
-      apocalypse: ["Dashboard green. Floor burning."]
-    },
-    wfm: {
-      mild: ["Shrinkage adjusted."],
-      dark: ["Forecast updated again."],
-      apocalypse: ["Staffing solved in Excel only."]
-    },
-    trainer: {
-      mild: ["Great engagement today!"],
-      dark: ["Everyone nodded. No one learned."],
-      apocalypse: ["Training done. Reality unchanged."]
-    },
-    client: {
-      mild: ["Can we improve CSAT?"],
-      dark: ["Why is AHT high?"],
-      apocalypse: ["Can you do more with less?"]
-    },
-    hr: {
-      mild: ["We hear you."],
-      dark: ["We are reviewing the policy."],
-      apocalypse: ["Let’s add a wellbeing survey."]
-    }
-  },
+const subtitles = {
+  pain: "Because alignment is optional.",
+  lies: "This sentence means nothing.",
+  recognition: "Real praise. Read carefully."
+};
 
-  lies: [
-    "This will only take five minutes.",
-    "We are aligned on this.",
-    "Let’s take this offline.",
-    "This is a people-first decision.",
-    "We value transparency.",
-    "This won’t impact workload.",
-    "We’ll revisit this next quarter.",
-    "This is industry best practice.",
-    "Everyone was consulted.",
-    "This is a great opportunity."
+const pain = {
+  agent: [
+    "Customer says they rebooted. They didn’t.",
+    "‘Quick call’ detected. Lies confirmed.",
+    "Agent fixes issue. Customer still angry."
+  ],
+  qa: [
+    "QA score: 98%. Let’s discuss the 2%.",
+    "Silence was 0.3 seconds too long."
+  ],
+  tm: [
+    "Meeting scheduled to discuss another meeting.",
+    "Action plan created. Execution pending."
+  ],
+  ops: [
+    "Dashboard green. Floor burning.",
+    "Forecast approved. Reality declined."
+  ],
+  wfm: [
+    "Shrinkage adjusted again.",
+    "Staffing solved in Excel only."
+  ],
+  trainer: [
+    "Everyone nodded. No one learned.",
+    "Training complete. Reality unchanged."
+  ],
+  client: [
+    "Can we improve CSAT without changing scope?",
+    "Why is AHT high this week?"
+  ],
+  hr: [
+    "We hear you.",
+    "Let’s add a wellbeing survey."
   ]
 };
 
-const output = document.getElementById("output");
-const toast = document.getElementById("toast");
-const streakEl = document.getElementById("streak");
-const todayEl = document.getElementById("today");
+const lies = [
+  "This won’t impact workload.",
+  "Everyone was consulted.",
+  "We are aligned on this.",
+  "Let’s revisit next quarter.",
+  "This is best practice.",
+  "This is a people-first decision."
+];
 
-let streak = Number(localStorage.getItem("streak")) || 0;
-const reactions = JSON.parse(localStorage.getItem("reactions")) || {
-  "Too real": 0,
-  "I lived this": 0,
-  "Who leaked this": 0
+const recognition = {
+  agent: [
+    "You handled situations most people couldn’t. That matters.",
+    "Your consistency kept things stable. We noticed."
+  ],
+  qa: [
+    "Your feedback improved quality without killing morale.",
+    "You protected standards with perspective."
+  ],
+  tm: [
+    "You absorbed pressure so the team could focus.",
+    "You showed up when it was easier not to."
+  ],
+  ops: [
+    "You made calls with incomplete data and owned them.",
+    "You kept things moving under real constraints."
+  ],
+  wfm: [
+    "You flagged risks early and adapted fast.",
+    "You kept the operation standing."
+  ],
+  trainer: [
+    "You prepared people for reality, not just slides.",
+    "Your work showed on the floor."
+  ],
+  client: [
+    "Thank you for the partnership and trust.",
+    "Your collaboration made a difference."
+  ],
+  hr: [
+    "You balanced people, policy, and pressure.",
+    "You showed care without losing clarity."
+  ]
 };
 
-todayEl.innerText = Math.floor(Math.random() * 300) + 100;
+const dashboards = {
+  agent: "📞 AHT: 🔴 | CSAT: 🟡 | Patience: ❌",
+  qa: "🧪 Quality: 🟢 | Findings: 📈 | Happiness: 🟡",
+  tm: "👥 Morale: 🔴 | Alignment: 🟡 | Actions: ❌",
+  ops: "📊 Forecast: 🟡 | Reality: 🔴 | Optimism: ❌",
+  wfm: "⏱ Coverage: 🟡 | Shrinkage: 📈 | Blame: 🟢",
+  trainer: "🎓 Readiness: 🟡 | Engagement: 🟢 | Retention: 🔴",
+  client: "📈 KPIs: 🟡 | Expectations: 📈 | Scope: ❌",
+  hr: "🧑‍⚖️ Policy: 🟢 | Sentiment: 🔴 | Surveys: 📈"
+};
+
+let streak = Number(localStorage.getItem("streak")) || 0;
+
+function updateSubtitle() {
+  document.getElementById("subtitle").innerText =
+    subtitles[document.getElementById("mode").value];
+}
 
 function generate() {
   const mode = document.getElementById("mode").value;
   const role = document.getElementById("role").value;
-  const intensity = document.getElementById("intensity").value;
+  const out = document.getElementById("output");
+  out.classList.remove("mail");
 
-  let text;
+  let text = "";
 
+  if (mode === "pain") {
+    text = pain[role][Math.floor(Math.random() * pain[role].length)];
+  }
   if (mode === "lies") {
-    text = data.lies[Math.floor(Math.random() * data.lies.length)];
-    document.getElementById("actionBtn").innerText = "Translate corporate";
-  } else {
-    const pool = data.jokes[role][intensity];
-    text = pool[Math.floor(Math.random() * pool.length)];
-    document.getElementById("actionBtn").innerText = "Hit me with pain";
+    text = `"${lies[Math.floor(Math.random() * lies.length)]}"`;
+  }
+  if (mode === "recognition") {
+    out.classList.add("mail");
+    text = recognition[role][Math.floor(Math.random() * recognition[role].length)];
   }
 
-  output.innerText = text;
+  out.innerText = text;
+  document.getElementById("dashboard").innerText = dashboards[role];
 }
 
 function react(type) {
-  reactions[type]++;
   streak++;
-  localStorage.setItem("reactions", JSON.stringify(reactions));
   localStorage.setItem("streak", streak);
-  streakEl.innerText = `🔥 Pain streak: ${streak}`;
-  showToast(`✅ ${type} · ${reactions[type]} people agree`);
+  document.getElementById("streak").innerText = `🔥 Pain streak: ${streak}`;
+  showToast(`${type}. We get it.`);
 }
 
 function copyText() {
-  navigator.clipboard.writeText(output.innerText);
-  showToast("📋 Copied. Use responsibly.");
+  navigator.clipboard.writeText(document.getElementById("output").innerText);
+  showToast("Copied. Use responsibly.");
 }
 
 function showToast(text) {
-  toast.innerText = text;
-  toast.classList.add("show");
-  setTimeout(() => toast.classList.remove("show"), 2000);
+  const t = document.getElementById("toast");
+  t.innerText = text;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2000);
 }
+
+updateSubtitle();
 </script>
 
 </body>
