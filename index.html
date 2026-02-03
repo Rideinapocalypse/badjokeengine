@@ -17,7 +17,7 @@ body {
 }
 
 .card {
-  width: 520px;
+  width: 560px;
   background: #020617;
   border-radius: 18px;
   padding: 30px;
@@ -35,7 +35,7 @@ h1 {
   margin-bottom: 18px;
 }
 
-select, button {
+select, button, textarea {
   width: 100%;
   padding: 12px;
   margin-top: 10px;
@@ -43,6 +43,12 @@ select, button {
   border: none;
   background: #1e293b;
   color: #e5e7eb;
+  font-family: inherit;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 70px;
 }
 
 button {
@@ -56,7 +62,7 @@ button:hover {
 }
 
 .output {
-  margin-top: 20px;
+  margin-top: 18px;
   min-height: 90px;
   padding: 18px;
   border-radius: 12px;
@@ -66,23 +72,33 @@ button:hover {
 }
 
 .output.mail {
-  background: #020617;
   border-left: 4px solid #22c55e;
-  font-size: 15px;
 }
 
-.reactions button {
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.tag {
+  padding: 6px 10px;
+  border-radius: 999px;
   background: #020617;
   border: 1px solid #334155;
-  margin-top: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  opacity: .85;
 }
 
-.copy {
-  background: #2563eb;
+.tag:hover {
+  opacity: 1;
+  background: #020617;
 }
 
 .metrics {
-  margin-top: 20px;
+  margin-top: 18px;
   font-size: 13px;
   opacity: .85;
 }
@@ -100,7 +116,6 @@ footer {
   text-align: center;
 }
 
-/* Toast */
 .toast {
   position: fixed;
   bottom: 30px;
@@ -114,7 +129,6 @@ footer {
   opacity: 0;
   pointer-events: none;
   transition: all .3s ease;
-  box-shadow: 0 10px 30px rgba(0,0,0,.6);
 }
 
 .toast.show {
@@ -130,10 +144,11 @@ footer {
   <h1>☎️ Bad Joke Engine</h1>
   <p class="subtitle" id="subtitle">Because alignment is optional.</p>
 
-  <select id="mode" onchange="updateSubtitle()">
+  <select id="mode" onchange="updateMode()">
     <option value="pain">🎭 Pain Generator</option>
     <option value="lies">🏢 Corporate Lies</option>
     <option value="recognition">🏆 Recognition Engine</option>
+    <option value="reframer">🧠 Reality Reframer</option>
   </select>
 
   <select id="role">
@@ -147,23 +162,16 @@ footer {
     <option value="hr">HR</option>
   </select>
 
-  <select id="intensity">
-    <option value="mild">😐 Mild</option>
-    <option value="dark">😈 Dark</option>
-    <option value="real">🖤 Real</option>
-  </select>
+  <textarea id="vent" placeholder="Describe the situation (no names, no details). This stays local." style="display:none"></textarea>
 
   <button onclick="generate()">Generate</button>
+
+  <div class="tags" id="kpiTags" style="display:none"></div>
 
   <div class="output" id="output"></div>
   <div class="streak" id="streak"></div>
 
-  <div class="reactions">
-    <button onclick="react('Too real')">✅ Too real</button>
-    <button onclick="react('I lived this')">😬 I lived this</button>
-    <button onclick="react('Who leaked this')">💀 Who leaked this?</button>
-    <button class="copy" onclick="copyText()">📋 Copy</button>
-  </div>
+  <button onclick="copyText()">📋 Copy</button>
 
   <div class="metrics" id="dashboard"></div>
 
@@ -178,150 +186,126 @@ footer {
 const subtitles = {
   pain: "Because alignment is optional.",
   lies: "This sentence means nothing.",
-  recognition: "Real praise. Read carefully."
+  recognition: "Real praise. Short. Honest.",
+  reframer: "Write it out. Click a KPI."
 };
 
 const pain = {
-  agent: [
-    "Customer says they rebooted. They didn’t.",
-    "‘Quick call’ detected. Lies confirmed.",
-    "Agent fixes issue. Customer still angry."
-  ],
-  qa: [
-    "QA score: 98%. Let’s discuss the 2%.",
-    "Silence was 0.3 seconds too long."
-  ],
-  tm: [
-    "Meeting scheduled to discuss another meeting.",
-    "Action plan created. Execution pending."
-  ],
-  ops: [
-    "Dashboard green. Floor burning.",
-    "Forecast approved. Reality declined."
-  ],
-  wfm: [
-    "Shrinkage adjusted again.",
-    "Staffing solved in Excel only."
-  ],
-  trainer: [
-    "Everyone nodded. No one learned.",
-    "Training complete. Reality unchanged."
-  ],
-  client: [
-    "Can we improve CSAT without changing scope?",
-    "Why is AHT high this week?"
-  ],
-  hr: [
-    "We hear you.",
-    "Let’s add a wellbeing survey."
-  ]
+  agent: ["Customer rebooted. Allegedly.", "Quick call confirmed. False."],
+  qa: ["98% score. Focus on 2%.", "Silence detected."],
+  tm: ["Meeting about another meeting.", "Action plan pending execution."],
+  ops: ["Dashboard green. Floor burning.", "Forecast approved by optimism."],
+  wfm: ["Shrinkage adjusted again.", "Excel says it works."],
+  trainer: ["Everyone nodded. No one learned."],
+  client: ["Can we do more with less?"],
+  hr: ["We hear you."]
 };
 
 const lies = [
   "This won’t impact workload.",
   "Everyone was consulted.",
-  "We are aligned on this.",
+  "We are aligned.",
   "Let’s revisit next quarter.",
-  "This is best practice.",
-  "This is a people-first decision."
+  "This is best practice."
 ];
 
 const recognition = {
-  agent: [
-    "You handled situations most people couldn’t. That matters.",
-    "Your consistency kept things stable. We noticed."
-  ],
-  qa: [
-    "Your feedback improved quality without killing morale.",
-    "You protected standards with perspective."
-  ],
-  tm: [
-    "You absorbed pressure so the team could focus.",
-    "You showed up when it was easier not to."
-  ],
-  ops: [
-    "You made calls with incomplete data and owned them.",
-    "You kept things moving under real constraints."
-  ],
-  wfm: [
-    "You flagged risks early and adapted fast.",
-    "You kept the operation standing."
-  ],
-  trainer: [
-    "You prepared people for reality, not just slides.",
-    "Your work showed on the floor."
-  ],
-  client: [
-    "Thank you for the partnership and trust.",
-    "Your collaboration made a difference."
-  ],
-  hr: [
-    "You balanced people, policy, and pressure.",
-    "You showed care without losing clarity."
-  ]
+  agent: ["You handled chaos with professionalism. That matters."],
+  qa: ["Your feedback improved quality without killing morale."],
+  tm: ["You absorbed pressure so others could work."],
+  ops: ["You made calls with incomplete data and owned them."],
+  wfm: ["You kept the operation standing."],
+  trainer: ["You prepared people for reality."],
+  client: ["Thank you for the partnership."],
+  hr: ["You balanced people and policy."]
 };
 
 const dashboards = {
   agent: "📞 AHT: 🔴 | CSAT: 🟡 | Patience: ❌",
-  qa: "🧪 Quality: 🟢 | Findings: 📈 | Happiness: 🟡",
-  tm: "👥 Morale: 🔴 | Alignment: 🟡 | Actions: ❌",
-  ops: "📊 Forecast: 🟡 | Reality: 🔴 | Optimism: ❌",
-  wfm: "⏱ Coverage: 🟡 | Shrinkage: 📈 | Blame: 🟢",
-  trainer: "🎓 Readiness: 🟡 | Engagement: 🟢 | Retention: 🔴",
-  client: "📈 KPIs: 🟡 | Expectations: 📈 | Scope: ❌",
-  hr: "🧑‍⚖️ Policy: 🟢 | Sentiment: 🔴 | Surveys: 📈"
+  qa: "🧪 Quality: 🟢 | Findings: 📈",
+  tm: "👥 Morale: 🔴 | Alignment: 🟡",
+  ops: "📊 Forecast: 🟡 | Reality: 🔴",
+  wfm: "⏱ Coverage: 🟡 | Shrinkage: 📈",
+  trainer: "🎓 Readiness: 🟡 | Retention: 🔴",
+  client: "📈 KPIs: 🟡 | Scope: ❌",
+  hr: "🧑‍⚖️ Policy: 🟢 | Sentiment: 🔴"
+};
+
+const kpis = {
+  "#AHT": ["AHT improves when conversations stop being conversations."],
+  "#CSAT": ["CSAT reflects emotions influenced elsewhere."],
+  "#FCR": ["FCR assumes issues are simple."],
+  "#QA": ["Quality expects perfection in imperfect systems."],
+  "#SLA": ["SLA assumes demand behaves."],
+  "#Shrinkage": ["Shrinkage is reality interrupting plans."],
+  "#Forecast": ["The forecast is accurate until tomorrow."],
+  "#Attrition": ["Attrition reflects cumulative pressure."],
+  "#Occupancy": ["Occupancy assumes humans behave like resources."],
+  "#Backlog": ["Backlog represents deferred reality."],
+  "#Adherence": ["Adherence competes with humanity."],
+  "#Productivity": ["Productivity increases through expectation."],
+  "#Utilization": ["Utilization ignores recovery."],
+  "#Escalations": ["Escalations replace trust."]
 };
 
 let streak = Number(localStorage.getItem("streak")) || 0;
 
-function updateSubtitle() {
-  document.getElementById("subtitle").innerText =
-    subtitles[document.getElementById("mode").value];
+function updateMode() {
+  const mode = document.getElementById("mode").value;
+  document.getElementById("subtitle").innerText = subtitles[mode];
+  document.getElementById("vent").style.display = mode === "reframer" ? "block" : "none";
+  document.getElementById("kpiTags").style.display = mode === "reframer" ? "flex" : "none";
 }
 
 function generate() {
   const mode = document.getElementById("mode").value;
   const role = document.getElementById("role").value;
-  const out = document.getElementById("output");
-  out.classList.remove("mail");
-
   let text = "";
 
-  if (mode === "pain") {
-    text = pain[role][Math.floor(Math.random() * pain[role].length)];
-  }
-  if (mode === "lies") {
-    text = `"${lies[Math.floor(Math.random() * lies.length)]}"`;
-  }
-  if (mode === "recognition") {
-    out.classList.add("mail");
-    text = recognition[role][Math.floor(Math.random() * recognition[role].length)];
-  }
+  if (mode === "pain") text = random(pain[role]);
+  if (mode === "lies") text = `"${random(lies)}"`;
+  if (mode === "recognition") text = random(recognition[role]);
+  if (mode === "reframer") text = "Select a KPI below to reframe.";
 
-  out.innerText = text;
+  document.getElementById("output").innerText = text;
   document.getElementById("dashboard").innerText = dashboards[role];
 }
 
-function react(type) {
-  streak++;
-  localStorage.setItem("streak", streak);
-  document.getElementById("streak").innerText = `🔥 Pain streak: ${streak}`;
-  showToast(`${type}. We get it.`);
+function buildKPIs() {
+  const container = document.getElementById("kpiTags");
+  container.innerHTML = "";
+  Object.keys(kpis).forEach(k => {
+    const el = document.createElement("div");
+    el.className = "tag";
+    el.innerText = k;
+    el.onclick = () => showKPI(k);
+    container.appendChild(el);
+  });
+}
+
+function showKPI(kpi) {
+  document.getElementById("output").innerText = random(kpis[kpi]);
+  toast(`KPI reframed: ${kpi}`);
 }
 
 function copyText() {
   navigator.clipboard.writeText(document.getElementById("output").innerText);
-  showToast("Copied. Use responsibly.");
+  toast("Copied. Use responsibly.");
 }
 
-function showToast(text) {
+function toast(text) {
   const t = document.getElementById("toast");
   t.innerText = text;
   t.classList.add("show");
   setTimeout(() => t.classList.remove("show"), 2000);
 }
 
-updateSubtitle();
+function random(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+buildKPIs();
+updateMode();
 </script>
 
 </body>
