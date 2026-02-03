@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Bad Joke Engine ☎️</title>
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .card {
+      background: #020617;
+      padding: 30px;
+      border-radius: 12px;
+      width: 420px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 5px;
+    }
+
+    p.subtitle {
+      font-size: 14px;
+      opacity: 0.8;
+      margin-bottom: 20px;
+    }
+
+    select, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 8px;
+      border: none;
+      font-size: 15px;
+    }
+
+    select {
+      background: #1e293b;
+      color: #e5e7eb;
+    }
+
+    button {
+      background: #ef4444;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #dc2626;
+    }
+
+    .joke {
+      margin-top: 20px;
+      font-size: 16px;
+      min-height: 60px;
+      background: #020617;
+      border: 1px dashed #334155;
+      padding: 15px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h1>☎️ Bad Joke Engine</h1>
+    <p class="subtitle">For people who survived call centers.</p>
+
+    <select id="role">
+      <option value="agent">Agent</option>
+      <option value="qa">QA</option>
+      <option value="tm">Team Manager</option>
+      <option value="ops">Operations</option>
+    </select>
+
+    <button onclick="generateJoke()">Hit me with pain</button>
+
+    <div class="joke" id="joke"></div>
+  </div>
+
+  <script>
+    const jokes = {
+      agent: [
+        "Customer: I already rebooted. Also customer: hasn’t rebooted since 2017.",
+        "‘This will be a quick call’ is a legally binding lie.",
+        "Agent after call: hydration break. Mentally.",
+        "Customer says calm down. Agent has been calm since minute one.",
+        "Hold music is louder than my will to live.",
+        "Agent script ends. Chaos begins.",
+        "Customer wants escalation. Has no reason.",
+        "Agent fixes issue. Customer still angry.",
+        "‘Can you stay on the line?’ No.",
+        "Agent smiles. Customer cannot see it."
+      ],
+      qa: [
+        "QA score: 98%. Feedback focuses on the missing 2%.",
+        "Great empathy. But did you breathe correctly?",
+        "QA listened twice. Still found something.",
+        "Silence was 0.3 seconds too long.",
+        "QA feedback starts with ‘Overall good…’",
+        "Everything correct. Still coached.",
+        "QA loves checklists more than people.",
+        "Call perfect. Documentation not.",
+        "QA heard a tone that doesn’t exist.",
+        "Compliance is a lifestyle."
+      ],
+      tm: [
+        "Let’s take this offline means never.",
+        "TM calendar is meetings about meetings.",
+        "Team morale discussed. Nothing changes.",
+        "TM says ‘open door’. Door closed.",
+        "TM trusts the numbers. Numbers lie.",
+        "One-on-one becomes group therapy.",
+        "TM action plan has 17 actions.",
+        "Escalation forwarded with ‘FYI’.",
+        "TM nods. Takes notes. Does nothing.",
+        "Let’s align."
+      ],
+      ops: [
+        "Ops says headcount is fine.",
+        "Forecast approved. Reality disagrees.",
+        "Ops dashboard is green. Floor is burning.",
+        "Attrition explained with a slide.",
+        "Ops promises optimization.",
+        "Shrinkage blamed on weather.",
+        "Ops loves Excel more than humans.",
+        "Budget locked. Expectations unlocked.",
+        "Ops sees risk. After it happens.",
+        "Let’s revisit next quarter."
+      ]
+    };
+
+    function generateJoke() {
+      const role = document.getElementById("role").value;
+      const roleJokes = jokes[role];
+      const randomIndex = Math.floor(Math.random() * roleJokes.length);
+      document.getElementById("joke").innerText = roleJokes[randomIndex];
+    }
+  </script>
+
+</body>
+</html>
