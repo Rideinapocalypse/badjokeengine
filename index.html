@@ -1,152 +1,225 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Bad Joke Engine ☎️</title>
-  <style>
-    body {
-      font-family: Arial, Helvetica, sans-serif;
-      background: #0f172a;
-      color: #e5e7eb;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
+<meta charset="UTF-8">
+<title>Bad Joke Engine ☎️</title>
 
-    .card {
-      background: #020617;
-      padding: 30px;
-      border-radius: 12px;
-      width: 420px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-      text-align: center;
-    }
+<style>
+body {
+  margin: 0;
+  height: 100vh;
+  font-family: Inter, Arial, sans-serif;
+  background: radial-gradient(circle at top, #020617, #000);
+  color: #e5e7eb;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-    h1 {
-      margin-bottom: 5px;
-    }
+.card {
+  width: 440px;
+  background: #020617;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 25px 60px rgba(0,0,0,.8);
+}
 
-    p.subtitle {
-      font-size: 14px;
-      opacity: 0.8;
-      margin-bottom: 20px;
-    }
+h1 {
+  margin: 0;
+}
 
-    select, button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-      border-radius: 8px;
-      border: none;
-      font-size: 15px;
-    }
+.subtitle {
+  font-size: 13px;
+  opacity: .7;
+  margin-bottom: 20px;
+}
 
-    select {
-      background: #1e293b;
-      color: #e5e7eb;
-    }
+select, button, input {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 10px;
+  border: none;
+  background: #1e293b;
+  color: #e5e7eb;
+}
 
-    button {
-      background: #ef4444;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
+button {
+  background: #ef4444;
+  font-weight: bold;
+  cursor: pointer;
+}
 
-    button:hover {
-      background: #dc2626;
-    }
+button:hover {
+  background: #dc2626;
+}
 
-    .joke {
-      margin-top: 20px;
-      font-size: 16px;
-      min-height: 60px;
-      background: #020617;
-      border: 1px dashed #334155;
-      padding: 15px;
-      border-radius: 8px;
-    }
-  </style>
+.joke {
+  margin-top: 20px;
+  min-height: 70px;
+  padding: 15px;
+  border-radius: 10px;
+  background: #000;
+  border: 1px dashed #334155;
+}
+
+.reactions button {
+  background: #020617;
+  border: 1px solid #334155;
+  margin-top: 8px;
+}
+
+.copy {
+  background: #2563eb;
+}
+
+.metrics {
+  margin-top: 20px;
+  font-size: 13px;
+  opacity: .8;
+}
+
+footer {
+  margin-top: 15px;
+  font-size: 11px;
+  opacity: .5;
+}
+</style>
 </head>
+
 <body>
 
-  <div class="card">
-    <h1>☎️ Bad Joke Engine</h1>
-    <p class="subtitle">For people who survived call centers.</p>
+<div class="card">
+  <h1>☎️ Bad Joke Engine</h1>
+  <p class="subtitle">For people who survived call centers.</p>
 
-    <select id="role">
-      <option value="agent">Agent</option>
-      <option value="qa">QA</option>
-      <option value="tm">Team Manager</option>
-      <option value="ops">Operations</option>
-    </select>
+  <select id="role">
+    <option value="agent">Agent</option>
+    <option value="qa">QA</option>
+    <option value="tm">Team Manager</option>
+    <option value="ops">Operations</option>
+    <option value="wfm">WFM / RTA</option>
+    <option value="trainer">Trainer</option>
+    <option value="client">Client</option>
+    <option value="hr">HR</option>
+  </select>
 
-    <button onclick="generateJoke()">Hit me with pain</button>
+  <select id="intensity">
+    <option value="mild">😐 Mild</option>
+    <option value="dark">😈 Dark</option>
+    <option value="apocalypse">☠️ Apocalypse</option>
+  </select>
 
-    <div class="joke" id="joke"></div>
+  <select id="mood">
+    <option>😴 Burnt Out</option>
+    <option>😐 Surviving</option>
+    <option>😈 Unhinged</option>
+    <option>🧘 Fake Calm</option>
+  </select>
+
+  <button id="actionBtn" onclick="generateJoke()">Hit me with pain</button>
+
+  <div class="joke" id="joke"></div>
+
+  <div class="reactions">
+    <button onclick="react('Too real')">✅ Too real</button>
+    <button onclick="react('I lived this')">😬 I lived this</button>
+    <button onclick="react('Who leaked this')">💀 Who leaked this?</button>
+    <button class="copy" onclick="copyJoke()">📋 Copy for Teams</button>
   </div>
 
-  <script>
-    const jokes = {
-      agent: [
-        "Customer: I already rebooted. Also customer: hasn’t rebooted since 2017.",
-        "‘This will be a quick call’ is a legally binding lie.",
-        "Agent after call: hydration break. Mentally.",
-        "Customer says calm down. Agent has been calm since minute one.",
-        "Hold music is louder than my will to live.",
-        "Agent script ends. Chaos begins.",
-        "Customer wants escalation. Has no reason.",
-        "Agent fixes issue. Customer still angry.",
-        "‘Can you stay on the line?’ No.",
-        "Agent smiles. Customer cannot see it."
-      ],
-      qa: [
-        "QA score: 98%. Feedback focuses on the missing 2%.",
-        "Great empathy. But did you breathe correctly?",
-        "QA listened twice. Still found something.",
-        "Silence was 0.3 seconds too long.",
-        "QA feedback starts with ‘Overall good…’",
-        "Everything correct. Still coached.",
-        "QA loves checklists more than people.",
-        "Call perfect. Documentation not.",
-        "QA heard a tone that doesn’t exist.",
-        "Compliance is a lifestyle."
-      ],
-      tm: [
-        "Let’s take this offline means never.",
-        "TM calendar is meetings about meetings.",
-        "Team morale discussed. Nothing changes.",
-        "TM says ‘open door’. Door closed.",
-        "TM trusts the numbers. Numbers lie.",
-        "One-on-one becomes group therapy.",
-        "TM action plan has 17 actions.",
-        "Escalation forwarded with ‘FYI’.",
-        "TM nods. Takes notes. Does nothing.",
-        "Let’s align."
-      ],
-      ops: [
-        "Ops says headcount is fine.",
-        "Forecast approved. Reality disagrees.",
-        "Ops dashboard is green. Floor is burning.",
-        "Attrition explained with a slide.",
-        "Ops promises optimization.",
-        "Shrinkage blamed on weather.",
-        "Ops loves Excel more than humans.",
-        "Budget locked. Expectations unlocked.",
-        "Ops sees risk. After it happens.",
-        "Let’s revisit next quarter."
-      ]
-    };
+  <div class="metrics">
+    <strong>📊 Live Metrics</strong><br>
+    Morale: 🔴 Critical<br>
+    Alignment: 🟡 Discussed<br>
+    Action Taken: ❌<br>
+    Meetings About Meetings: 📈
+  </div>
 
-    function generateJoke() {
-      const role = document.getElementById("role").value;
-      const roleJokes = jokes[role];
-      const randomIndex = Math.floor(Math.random() * roleJokes.length);
-      document.getElementById("joke").innerText = roleJokes[randomIndex];
-    }
-  </script>
+  <footer>
+    Built by people who answered the phone.
+  </footer>
+</div>
+
+<script>
+const jokes = {
+  agent: {
+    mild: [
+      "Customer says they tried everything. They didn’t.",
+      "‘Quick call’ detected. Lies confirmed."
+    ],
+    dark: [
+      "Agent smiles. Customer can’t see it.",
+      "Hold music outlives motivation."
+    ],
+    apocalypse: [
+      "Customer works in IT. Issue persists.",
+      "Agent fixes problem. Customer still angry."
+    ]
+  },
+  qa: {
+    mild: ["Great call. Let’s review one thing."],
+    dark: ["QA score 98%. Let’s talk about 2%."],
+    apocalypse: ["Silence was 0.3 seconds too long."]
+  },
+  tm: {
+    mild: ["Let’s align later."],
+    dark: ["Meeting about another meeting."],
+    apocalypse: ["Action plan has 17 actions. None executed."]
+  },
+  ops: {
+    mild: ["Numbers look fine."],
+    dark: ["Forecast approved. Reality declined."],
+    apocalypse: ["Dashboard green. Floor burning."]
+  },
+  wfm: {
+    mild: ["Shrinkage adjusted."],
+    dark: ["Forecast updated again."],
+    apocalypse: ["Staffing solved in Excel only."]
+  },
+  trainer: {
+    mild: ["Great engagement today!"],
+    dark: ["Everyone nodded. No one learned."],
+    apocalypse: ["Training done. Reality unchanged."]
+  },
+  client: {
+    mild: ["Can we improve CSAT?" ],
+    dark: ["Why is AHT high?" ],
+    apocalypse: ["Can you do more with less?" ]
+  },
+  hr: {
+    mild: ["We hear you."],
+    dark: ["We’re reviewing the policy."],
+    apocalypse: ["Let’s add a wellbeing survey."]
+  }
+};
+
+function generateJoke() {
+  const role = roleSelect.value;
+  const intensity = intensitySelect.value;
+  const pool = jokes[role][intensity];
+  const joke = pool[Math.floor(Math.random() * pool.length)];
+  jokeBox.innerText = joke;
+  actionBtn.innerText = role === "ops" ? "Approve forecast" :
+                        role === "qa" ? "Find the gap" :
+                        role === "tm" ? "Align" :
+                        "Hit me with pain";
+}
+
+function react(text) {
+  alert(text + " ✔️");
+}
+
+function copyJoke() {
+  navigator.clipboard.writeText(jokeBox.innerText);
+  alert("Copied. Use responsibly.");
+}
+
+const roleSelect = document.getElementById("role");
+const intensitySelect = document.getElementById("intensity");
+const jokeBox = document.getElementById("joke");
+const actionBtn = document.getElementById("actionBtn");
+</script>
 
 </body>
 </html>
