@@ -3,309 +3,296 @@
 <head>
 <meta charset="UTF-8" />
 <title>Bad Joke Engine ☎️</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <style>
-body {
-  margin: 0;
-  height: 100vh;
-  font-family: Inter, Arial, sans-serif;
-  background: radial-gradient(circle at top, #020617, #000);
-  color: #e5e7eb;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+:root{
+  --bg:#060b18;
+  --card:#0d152a;
+  --soft:#1b2745;
+  --accent:#ef4444;
+  --text:#e5e7eb;
+  --muted:#9ca3af;
+  --tag:#223055;
 }
 
-.card {
-  width: 560px;
-  background: #020617;
-  border-radius: 18px;
-  padding: 30px;
-  box-shadow: 0 30px 70px rgba(0,0,0,.85);
+*{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont;}
+
+body{
+  margin:0;
+  background:radial-gradient(circle at top,var(--soft),var(--bg));
+  color:var(--text);
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  padding:40px 12px;
 }
 
-h1 {
-  margin: 0;
-  font-size: 26px;
+.app{
+  width:420px;
+  background:var(--card);
+  border-radius:14px;
+  padding:22px;
+  box-shadow:0 20px 60px rgba(0,0,0,.6);
 }
 
-.subtitle {
-  font-size: 13px;
-  opacity: .7;
-  margin-bottom: 18px;
+h1{
+  margin:0 0 6px;
+  font-size:22px;
 }
 
-select, button, textarea {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  border-radius: 10px;
-  border: none;
-  background: #1e293b;
-  color: #e5e7eb;
-  font-family: inherit;
+.subtitle{
+  font-size:13px;
+  color:var(--muted);
+  margin-bottom:16px;
 }
 
-textarea {
-  resize: vertical;
-  min-height: 70px;
+select,textarea,button{
+  width:100%;
+  border-radius:10px;
+  border:none;
+  padding:12px;
+  background:var(--soft);
+  color:var(--text);
+  font-size:14px;
 }
 
-button {
-  background: #ef4444;
-  font-weight: bold;
-  cursor: pointer;
+select{margin-bottom:10px;}
+textarea{resize:none;height:90px;margin-bottom:10px;}
+
+button.primary{
+  background:var(--accent);
+  color:white;
+  font-weight:600;
+  cursor:pointer;
+  margin:10px 0;
 }
 
-button:hover {
-  background: #dc2626;
+button.secondary{
+  background:transparent;
+  border:1px solid var(--accent);
+  color:var(--accent);
+  margin-top:8px;
+  cursor:pointer;
 }
 
-.output {
-  margin-top: 18px;
-  min-height: 90px;
-  padding: 18px;
-  border-radius: 12px;
-  background: #000;
-  border-left: 4px solid #334155;
-  font-size: 16px;
+.output{
+  background:black;
+  border-radius:10px;
+  padding:14px;
+  min-height:60px;
+  margin-top:10px;
+  font-size:14px;
 }
 
-.output.mail {
-  border-left: 4px solid #22c55e;
+.tags{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:10px;
 }
 
-.tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
+.tag{
+  background:var(--tag);
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:12px;
+  cursor:pointer;
 }
 
-.tag {
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: #020617;
-  border: 1px solid #334155;
-  font-size: 12px;
-  cursor: pointer;
-  opacity: .85;
-}
-
-.tag:hover {
-  opacity: 1;
-  background: #020617;
-}
-
-.metrics {
-  margin-top: 18px;
-  font-size: 13px;
-  opacity: .85;
-}
-
-.streak {
-  margin-top: 8px;
-  font-size: 12px;
-  opacity: .7;
-}
-
-footer {
-  margin-top: 16px;
-  font-size: 11px;
-  opacity: .5;
-  text-align: center;
-}
-
-.toast {
-  position: fixed;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%) translateY(20px);
-  background: #020617;
-  border: 1px solid #334155;
-  padding: 12px 18px;
-  border-radius: 999px;
-  font-size: 14px;
-  opacity: 0;
-  pointer-events: none;
-  transition: all .3s ease;
-}
-
-.toast.show {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
+.footer{
+  font-size:11px;
+  color:var(--muted);
+  margin-top:14px;
+  text-align:center;
 }
 </style>
 </head>
 
 <body>
+<div class="app">
 
-<div class="card">
-  <h1>☎️ Bad Joke Engine</h1>
-  <p class="subtitle" id="subtitle">Because alignment is optional.</p>
+<h1>☎️ Bad Joke Engine</h1>
+<div class="subtitle">Because alignment is optional.</div>
 
-  <select id="mode" onchange="updateMode()">
-    <option value="pain">🎭 Pain Generator</option>
-    <option value="lies">🏢 Corporate Lies</option>
-    <option value="recognition">🏆 Recognition Engine</option>
-    <option value="reframer">🧠 Reality Reframer</option>
-  </select>
+<select id="mode">
+  <option value="pain">🔥 Pain Generator</option>
+  <option value="lies">🏢 Corporate Lies</option>
+  <option value="recognition">🏆 Recognition Mail</option>
+  <option value="reframer">🧠 Reality Reframer</option>
+</select>
 
-  <select id="role">
-    <option value="agent">Agent</option>
-    <option value="qa">QA</option>
-    <option value="tm">Team Manager</option>
-    <option value="ops">Operations</option>
-    <option value="wfm">WFM / RTA</option>
-    <option value="trainer">Trainer</option>
-    <option value="client">Client</option>
-    <option value="hr">HR</option>
-  </select>
+<select id="role">
+  <option>Agent</option>
+  <option>QA</option>
+  <option>Team Manager</option>
+  <option>Operations</option>
+  <option>WFM</option>
+  <option>Trainer</option>
+</select>
 
-  <textarea id="vent" placeholder="Describe the situation (no names, no details). This stays local." style="display:none"></textarea>
+<textarea id="vent" placeholder="Describe the situation (optional, stays untouched)..."></textarea>
 
-  <button onclick="generate()">Generate</button>
+<button class="primary" onclick="generate()">Generate</button>
 
-  <div class="tags" id="kpiTags" style="display:none"></div>
+<div class="output" id="output"></div>
 
-  <div class="output" id="output"></div>
-  <div class="streak" id="streak"></div>
+<div id="kpis" class="tags" style="display:none"></div>
 
-  <button onclick="copyText()">📋 Copy</button>
+<button class="secondary" onclick="copy()">📋 Copy</button>
 
-  <div class="metrics" id="dashboard"></div>
-
-  <footer>
-    Built by people who answered the phone.
-  </footer>
+<div class="footer">
+AHT 🔴 | CSAT 🟡 | Patience ❌<br/>
+Built by people who answered the phone.
 </div>
 
-<div class="toast" id="toast"></div>
+</div>
 
 <script>
-const subtitles = {
-  pain: "Because alignment is optional.",
-  lies: "This sentence means nothing.",
-  recognition: "Real praise. Short. Honest.",
-  reframer: "Write it out. Click a KPI."
+const pain={
+Agent:[
+"Customer rebooted. Allegedly.",
+"This will be quick. It wasn't.",
+"They tried everything. Except listening."
+],
+QA:[
+"Great call. Let’s discuss the missing 2%.",
+"Quality met expectations. Expectations changed."
+],
+"Team Manager":[
+"Let’s align offline. Permanently.",
+"Just one quick meeting."
+],
+Operations:[
+"We’ll stabilize after this change.",
+"Escalations are under control."
+],
+WFM:[
+"Forecast assumed perfect attendance.",
+"Shrinkage is within tolerance."
+],
+Trainer:[
+"They were trained.",
+"Knowledge transfer was successful."
+]
 };
 
-const pain = {
-  agent: ["Customer rebooted. Allegedly.", "Quick call confirmed. False."],
-  qa: ["98% score. Focus on 2%.", "Silence detected."],
-  tm: ["Meeting about another meeting.", "Action plan pending execution."],
-  ops: ["Dashboard green. Floor burning.", "Forecast approved by optimism."],
-  wfm: ["Shrinkage adjusted again.", "Excel says it works."],
-  trainer: ["Everyone nodded. No one learned."],
-  client: ["Can we do more with less?"],
-  hr: ["We hear you."]
-};
-
-const lies = [
-  "This won’t impact workload.",
-  "Everyone was consulted.",
-  "We are aligned.",
-  "Let’s revisit next quarter.",
-  "This is best practice."
+const lies=[
+"Capacity is sufficient.",
+"This is a learning opportunity.",
+"We hear you.",
+"Let’s circle back.",
+"This won’t impact morale."
 ];
 
-const recognition = {
-  agent: ["You handled chaos with professionalism. That matters."],
-  qa: ["Your feedback improved quality without killing morale."],
-  tm: ["You absorbed pressure so others could work."],
-  ops: ["You made calls with incomplete data and owned them."],
-  wfm: ["You kept the operation standing."],
-  trainer: ["You prepared people for reality."],
-  client: ["Thank you for the partnership."],
-  hr: ["You balanced people and policy."]
+const recognition={
+Agent:"Great job maintaining professionalism in challenging conditions.",
+QA:"Thank you for ensuring consistency across unpredictable realities.",
+"Team Manager":"Appreciate your leadership during continuous change.",
+Operations:"Thanks for holding the system together.",
+WFM:"Forecast accuracy is appreciated given assumptions.",
+Trainer:"Thanks for preparing teams for theoretical scenarios."
 };
 
-const dashboards = {
-  agent: "📞 AHT: 🔴 | CSAT: 🟡 | Patience: ❌",
-  qa: "🧪 Quality: 🟢 | Findings: 📈",
-  tm: "👥 Morale: 🔴 | Alignment: 🟡",
-  ops: "📊 Forecast: 🟡 | Reality: 🔴",
-  wfm: "⏱ Coverage: 🟡 | Shrinkage: 📈",
-  trainer: "🎓 Readiness: 🟡 | Retention: 🔴",
-  client: "📈 KPIs: 🟡 | Scope: ❌",
-  hr: "🧑‍⚖️ Policy: 🟢 | Sentiment: 🔴"
+const kpiJokes={
+AHT:[
+"AHT improves when conversations stop being conversations.",
+"Efficiency increases once empathy is removed."
+],
+CSAT:[
+"CSAT reflects emotions caused elsewhere.",
+"Happiness is measured independently of causes."
+],
+QA:[
+"Quality is perfection inside chaos.",
+"Consistency over comfort."
+],
+SLA:[
+"SLA assumes demand behaves.",
+"Breaches are learning moments."
+],
+Shrinkage:[
+"Reality interrupting planning.",
+"Fully accounted for, except when not."
+],
+Forecast:[
+"Accurate until tomorrow.",
+"Optimism with numbers."
+],
+Attrition:[
+"Talent mobility metric.",
+"Unexpected but recurring."
+],
+Occupancy:[
+"Busy without progress.",
+"Always optimized."
+],
+Backlog:[
+"Deferred success.",
+"Customer patience storage."
+],
+Adherence:[
+"Time obeys schedules.",
+"Flexibility discouraged."
+],
+Productivity:[
+"Measured activity, not outcomes.",
+"Busy indicators green."
+],
+Utilization:[
+"Maximum effort expected.",
+"Human buffer assumed."
+],
+Escalations:[
+"Visibility achieved.",
+"Leadership notified."
+],
+FCR:[
+"Resolved unless reopened.",
+"Success defined narrowly."
+],
+Patience:[
+"Out of scope.",
+"Not tracked."
+]
 };
 
-const kpis = {
-  "#AHT": ["AHT improves when conversations stop being conversations."],
-  "#CSAT": ["CSAT reflects emotions influenced elsewhere."],
-  "#FCR": ["FCR assumes issues are simple."],
-  "#QA": ["Quality expects perfection in imperfect systems."],
-  "#SLA": ["SLA assumes demand behaves."],
-  "#Shrinkage": ["Shrinkage is reality interrupting plans."],
-  "#Forecast": ["The forecast is accurate until tomorrow."],
-  "#Attrition": ["Attrition reflects cumulative pressure."],
-  "#Occupancy": ["Occupancy assumes humans behave like resources."],
-  "#Backlog": ["Backlog represents deferred reality."],
-  "#Adherence": ["Adherence competes with humanity."],
-  "#Productivity": ["Productivity increases through expectation."],
-  "#Utilization": ["Utilization ignores recovery."],
-  "#Escalations": ["Escalations replace trust."]
-};
+function generate(){
+const mode=document.getElementById("mode").value;
+const role=document.getElementById("role").value;
+const out=document.getElementById("output");
+const k=document.getElementById("kpis");
+k.style.display="none";
 
-let streak = Number(localStorage.getItem("streak")) || 0;
-
-function updateMode() {
-  const mode = document.getElementById("mode").value;
-  document.getElementById("subtitle").innerText = subtitles[mode];
-  document.getElementById("vent").style.display = mode === "reframer" ? "block" : "none";
-  document.getElementById("kpiTags").style.display = mode === "reframer" ? "flex" : "none";
+if(mode==="pain"){
+out.innerText=random(pain[role]);
+}
+if(mode==="lies"){
+out.innerText=random(lies);
+}
+if(mode==="recognition"){
+out.innerText=recognition[role];
+}
+if(mode==="reframer"){
+out.innerText="Select a KPI to translate reality.";
+k.innerHTML="";
+Object.keys(kpiJokes).forEach(t=>{
+const d=document.createElement("div");
+d.className="tag";
+d.innerText="#"+t;
+d.onclick=()=>out.innerText=random(kpiJokes[t]);
+k.appendChild(d);
+});
+k.style.display="flex";
+}
 }
 
-function generate() {
-  const mode = document.getElementById("mode").value;
-  const role = document.getElementById("role").value;
-  let text = "";
+function random(arr){return arr[Math.floor(Math.random()*arr.length)];}
 
-  if (mode === "pain") text = random(pain[role]);
-  if (mode === "lies") text = `"${random(lies)}"`;
-  if (mode === "recognition") text = random(recognition[role]);
-  if (mode === "reframer") text = "Select a KPI below to reframe.";
-
-  document.getElementById("output").innerText = text;
-  document.getElementById("dashboard").innerText = dashboards[role];
+function copy(){
+navigator.clipboard.writeText(document.getElementById("output").innerText);
 }
-
-function buildKPIs() {
-  const container = document.getElementById("kpiTags");
-  container.innerHTML = "";
-  Object.keys(kpis).forEach(k => {
-    const el = document.createElement("div");
-    el.className = "tag";
-    el.innerText = k;
-    el.onclick = () => showKPI(k);
-    container.appendChild(el);
-  });
-}
-
-function showKPI(kpi) {
-  document.getElementById("output").innerText = random(kpis[kpi]);
-  toast(`KPI reframed: ${kpi}`);
-}
-
-function copyText() {
-  navigator.clipboard.writeText(document.getElementById("output").innerText);
-  toast("Copied. Use responsibly.");
-}
-
-function toast(text) {
-  const t = document.getElementById("toast");
-  t.innerText = text;
-  t.classList.add("show");
-  setTimeout(() => t.classList.remove("show"), 2000);
-}
-
-function random(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
-buildKPIs();
-updateMode();
 </script>
 
 </body>
