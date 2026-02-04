@@ -1,321 +1,186 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <title>Bad Joke Engine ☎️</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <style>
-body{
-  margin:0;
-  background:#050a18;
-  color:#e5e7eb;
-  font-family:system-ui,-apple-system,BlinkMacSystemFont;
-  display:flex;
-  justify-content:center;
-  padding:40px;
-}
-.card{
-  width:460px;
-  background:#0c142b;
-  border-radius:16px;
-  padding:22px;
-}
-h1{margin:0}
-small{color:#9ca3af}
+* { box-sizing: border-box; }
 
-select,button{
-  width:100%;
-  padding:10px;
-  margin-top:10px;
-  border-radius:8px;
-  border:none;
-  background:#1f2a44;
-  color:#e5e7eb;
-}
-button{
-  background:#ef4444;
-  font-weight:600;
-  cursor:pointer;
+body {
+  margin: 0;
+  font-family: Inter, Arial, sans-serif;
+  background: #020617;
+  color: #e5e7eb;
 }
 
-.mode{
-  display:none;
-  margin-top:20px;
-  padding-top:16px;
-  border-top:1px solid #1f2a44;
-}
-.mode.active{display:block}
-
-.output{
-  background:black;
-  padding:12px;
-  border-radius:8px;
-  margin-top:10px;
-  min-height:40px;
-  white-space:pre-line;
+.layout {
+  display: grid;
+  grid-template-columns: 260px 1fr 260px;
+  min-height: 100vh;
 }
 
-.tags span{
-  display:inline-block;
-  background:#1f2a44;
-  padding:6px 10px;
-  border-radius:999px;
-  margin:4px;
-  cursor:pointer;
-  font-size:12px;
+/* DASHBOARDS */
+.dashboard {
+  background: #020617;
+  border-right: 1px solid #111827;
+  border-left: 1px solid #111827;
+  padding: 16px;
+  font-size: 13px;
+  color: #9ca3af;
 }
 
-.badge{
-  display:inline-block;
-  margin-top:8px;
-  padding:6px 10px;
-  border-radius:6px;
-  background:#1f2a44;
-  font-size:12px;
+.dashboard h3 {
+  margin: 0 0 12px;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: #fca5a5;
 }
 
-.choice{
-  background:#1f2a44;
-  padding:10px;
-  border-radius:8px;
-  margin-top:8px;
-  cursor:pointer;
-}
-.choice small{
-  display:block;
-  color:#9ca3af;
-  margin-top:4px;
-  font-size:11px;
+.metric {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
 }
 
-.toggle{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  font-size:12px;
-  margin-top:10px;
-  color:#9ca3af;
+.alert {
+  margin-top: 12px;
+  color: #f87171;
+  font-weight: 600;
+}
+
+/* CENTER APP */
+.app {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+}
+
+.card {
+  width: 100%;
+  max-width: 520px;
+  background: linear-gradient(180deg, #020617, #000);
+  border: 1px solid #111827;
+  border-radius: 14px;
+  padding: 24px;
+}
+
+h1 {
+  margin-top: 0;
+  font-size: 22px;
+}
+
+select, textarea, button {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #1f2933;
+  background: #020617;
+  color: #e5e7eb;
+}
+
+button {
+  cursor: pointer;
+  font-weight: 600;
+  background: #111827;
+}
+
+.output {
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px dashed #374151;
+  border-radius: 8px;
+  min-height: 60px;
+  font-size: 14px;
+}
+
+/* MOBILE */
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+  .dashboard {
+    display: none;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<div class="card">
-<h1>☎️ Bad Joke Engine</h1>
-<small>Because alignment is optional.</small>
+<div class="layout">
 
-<select onchange="switchMode(this.value)">
-  <option value="pain">🔥 Pain Generator</option>
-  <option value="lies">🏢 Corporate Lies</option>
-  <option value="recognition">🏆 Recognition</option>
-  <option value="reframer">🧠 Reality Reframer</option>
-  <option value="roleplay">🎭 KPI Role Play</option>
-  <option value="angry">😡 Angry Customer Simulator</option>
-</select>
+  <!-- LEFT DASHBOARD -->
+  <aside class="dashboard">
+    <h3>EXECUTIVE SNAPSHOT</h3>
+    <div class="metric"><span>CSAT</span><span>🔴 3.1</span></div>
+    <div class="metric"><span>QA</span><span>❌ 86%</span></div>
+    <div class="metric"><span>FCR</span><span>🟡 71%</span></div>
+    <div class="metric"><span>Attrition</span><span>📉 8.2%</span></div>
+    <div class="metric"><span>Shrinkage</span><span>⚠️ 14.6%</span></div>
+    <div class="metric"><span>Morale</span><span>❓ N/A</span></div>
+    <div class="alert">⚠️ Action Required</div>
+  </aside>
 
-<select id="role">
-  <option>Agent</option>
-  <option>QA</option>
-  <option>Team Manager</option>
-  <option>Operations</option>
-  <option>WFM</option>
-  <option>Trainer</option>
-  <option>HR</option>
-  <option>IT Support</option>
-  <option>Client Manager</option>
-</select>
+  <!-- MAIN APP -->
+  <main class="app">
+    <div class="card">
+      <h1>Bad Joke Engine ☎️</h1>
 
-<!-- PAIN -->
-<div class="mode active" id="pain">
-<button onclick="pain()">Generate Pain</button>
-<div class="output" id="painOut"></div>
-</div>
+      <label>Choose your role</label>
+      <select id="role">
+        <option>Agent</option>
+        <option>Team Leader</option>
+        <option>QA</option>
+        <option>WFM</option>
+        <option>Operations Manager</option>
+        <option>Client</option>
+      </select>
 
-<!-- LIES -->
-<div class="mode" id="lies">
-<button onclick="lie()">Generate Lie</button>
-<div class="output" id="lieOut"></div>
-</div>
+      <label>Write your problem</label>
+      <textarea id="problem" rows="3" placeholder="Customer yelling, KPI broken, system down..."></textarea>
 
-<!-- RECOGNITION -->
-<div class="mode" id="recognition">
-<button onclick="recognize()">Generate Recognition</button>
-<div class="output" id="recOut"></div>
-</div>
+      <button onclick="generate()">Generate Reality</button>
 
-<!-- REFRAMER -->
-<div class="mode" id="reframer">
-<small>Click a KPI</small>
-<div class="tags">
-<span onclick="kpi('AHT')">#AHT</span>
-<span onclick="kpi('CSAT')">#CSAT</span>
-<span onclick="kpi('QA')">#QA</span>
-<span onclick="kpi('Forecast')">#Forecast</span>
-<span onclick="kpi('Shrinkage')">#Shrinkage</span>
-<span onclick="kpi('Escalations')">#Escalations</span>
-</div>
-<div class="output" id="kpiOut">Reality pending…</div>
-</div>
+      <div class="output" id="output">Waiting for suffering input...</div>
+    </div>
+  </main>
 
-<!-- ROLE PLAY -->
-<div class="mode" id="roleplay">
-<select id="rpKpi">
-  <option>CSAT</option>
-  <option>AHT</option>
-  <option>QA</option>
-  <option>Forecast</option>
-  <option>SLA</option>
-  <option>Escalations</option>
-</select>
-<button onclick="startRolePlay()">▶ Start Scenario</button>
-<div class="output" id="rpScenario"></div>
-<button onclick="revealKPI()" id="revealBtn" style="display:none">👉 Reveal KPI Perspective</button>
-<div class="output" id="rpKpiOut"></div>
-</div>
-
-<!-- ANGRY CUSTOMER -->
-<div class="mode" id="angry">
-<small>😡 Angry Customer Simulator<br>“Choose wisely. Metrics are watching.”</small>
-
-<div class="toggle">
-  <input type="checkbox" id="lensToggle">
-  <label for="lensToggle">Show KPI lens</label>
-</div>
-
-<div class="output" id="angryText"></div>
-
-<div id="choices"></div>
-
-<div class="output" id="angryResult"></div>
-</div>
+  <!-- RIGHT DASHBOARD -->
+  <aside class="dashboard">
+    <h3>LIVE OPS MONITOR</h3>
+    <div class="metric"><span>AHT</span><span>⏱ 642s ↑</span></div>
+    <div class="metric"><span>Backlog</span><span>📦 1,384</span></div>
+    <div class="metric"><span>Escalations</span><span>🚨 +7</span></div>
+    <div class="metric"><span>SLA</span><span>🔴 At Risk</span></div>
+    <div class="metric"><span>Adherence</span><span>⚠️ 82%</span></div>
+    <div class="metric"><span>Forecast</span><span>🤞 61%</span></div>
+    <div class="alert">🔔 Alerts Active</div>
+  </aside>
 
 </div>
 
 <script>
-/* ---------- BASIC MODES ---------- */
-const pains=[
-"This will be quick. It wasn’t.",
-"They rebooted. Allegedly.",
-"Customer already tried everything."
-];
-const lies=[
-"We hear you.",
-"This won’t impact morale.",
-"Capacity is sufficient."
-];
-const recs=[
-"Thank you for your professionalism under pressure.",
-"Appreciate your flexibility during ongoing changes.",
-"Great resilience shown."
-];
-const kpiJokes={
-AHT:["AHT improves when conversations stop being conversations."],
-CSAT:["CSAT reflects emotions caused elsewhere."],
-QA:["Quality is perfection inside chaos."],
-Forecast:["Accurate until tomorrow."],
-Shrinkage:["Reality interrupting planning."],
-Escalations:["Visibility achieved."]
-};
+function generate() {
+  const role = document.getElementById("role").value;
+  const problem = document.getElementById("problem").value || "unspecified operational challenge";
 
-function switchMode(m){
-document.querySelectorAll(".mode").forEach(d=>d.classList.remove("active"));
-document.getElementById(m).classList.add("active");
-if(m==="angry") startAngry();
-}
+  const responses = [
+    `As a ${role}, this will be reviewed after alignment.`,
+    `Thank you for raising this. KPIs remain unchanged.`,
+    `This has been noted and deprioritized.`,
+    `We acknowledge the pain. Please manage expectations.`,
+    `This will be addressed in a future roadmap.`,
+    `Let’s take this offline (never).`
+  ];
 
-function pain(){painOut.innerText=random(pains);}
-function lie(){lieOut.innerText=random(lies);}
-function recognize(){recOut.innerText=random(recs);}
-function kpi(k){kpiOut.innerText=random(kpiJokes[k]);}
-
-/* ---------- ROLE PLAY ---------- */
-const rolePlays={
-"Agent|CSAT":{
-s:"Customer waited due to outage. You explain clearly. Customer says it’s not your fault.",
-k:"Customer sentiment recorded as neutral-negative. External factors ignored.",
-o:"❌ Not Aligned"
+  const result = responses[Math.floor(Math.random() * responses.length)];
+  document.getElementById("output").innerText =
+    `"${problem}" → ${result}`;
 }
-};
-let currentKey=null;
-function startRolePlay(){
-const r=role.value;
-const k=rpKpi.value;
-currentKey=r+"|"+k;
-const data=rolePlays[currentKey];
-rpScenario.innerText="🎧 Scenario\n"+(data?data.s:"No scenario defined.");
-rpKpiOut.innerText="";
-revealBtn.style.display="block";
-}
-function revealKPI(){
-const data=rolePlays[currentKey];
-if(!data)return;
-rpKpiOut.innerHTML="📊 KPI Evaluation\n"+data.k+"\n\n"+data.o;
-}
-
-/* ---------- ANGRY CUSTOMER SIMULATOR ---------- */
-let angryStep=1;
-
-function startAngry(){
-angryStep=1;
-angryResult.innerText="";
-angryText.innerText=
-"I’VE BEEN ON HOLD FOREVER.\nNOBODY KNOWS WHAT THEY’RE DOING.\nTHIS IS UNACCEPTABLE.";
-renderChoices([
-{t:"I understand how frustrating this is and I’ll help you.",h:"Empathy",n:"Customer scoffs but listens."},
-{t:"Please calm down so I can assist you.",h:"Control",n:"Customer becomes more hostile."},
-{t:"There is a known outage causing delays.",h:"Efficiency",n:"Customer feels dismissed."},
-{t:"I’ll escalate this to a supervisor.",h:"Escalation",n:"Customer demands escalation."}
-]);
-}
-
-function renderChoices(arr){
-choices.innerHTML="";
-arr.forEach((c,i)=>{
-const d=document.createElement("div");
-d.className="choice";
-d.innerText=c.t;
-if(lensToggle.checked){
-const s=document.createElement("small");
-s.innerText=c.h;
-d.appendChild(s);
-}
-d.onclick=()=>nextAngry(c);
-choices.appendChild(d);
-});
-}
-
-function nextAngry(choice){
-if(angryStep===1){
-angryText.innerText=choice.n;
-angryStep=2;
-renderChoices([
-{t:"I’m really trying to resolve this for you.",h:"Empathy",n:"Customer calms slightly."},
-{t:"This is the fastest available option.",h:"Efficiency",n:"Customer remains upset."},
-{t:"I will transfer you now.",h:"Escalation",n:"Supervisor takes over."}
-]);
-}else{
-endAngry(choice.h);
-}
-}
-
-function endAngry(type){
-choices.innerHTML="";
-let result="";
-if(type==="Empathy"){
-result="😡 Customer: Still unhappy but heard.\n📊 CSAT: ❌ Not Aligned\nAHT: 🧠 Human Cost Detected\n\n🧠 Human Cost Detected";
-}
-if(type==="Efficiency"){
-result="😡 Customer: Dissatisfied.\n📊 AHT: 📊 Metric Satisfied\nCSAT: ❌ Not Aligned\n\n📊 Metric Satisfied";
-}
-if(type==="Escalation"){
-result="😡 Customer: Removed from line.\n📊 Escalations: ❌ Increased\nAHT: 📊 Metric Satisfied\n\n❌ Not Aligned";
-}
-angryResult.innerText=result;
-}
-
-function random(a){return a[Math.floor(Math.random()*a.length)];}
 </script>
 
 </body>
