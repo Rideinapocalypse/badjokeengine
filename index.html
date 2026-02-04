@@ -15,40 +15,42 @@ body{
   justify-content:center;
   padding:40px;
 }
-
 .card{
-  width:420px;
+  width:440px;
   background:#0c142b;
-  border-radius:14px;
-  padding:20px;
+  border-radius:16px;
+  padding:22px;
 }
-
 h1{margin:0}
 small{color:#9ca3af}
 
-section{
-  margin-top:22px;
-  padding-top:14px;
-  border-top:1px solid #1f2a44;
-}
-
-button{
+select,button{
   width:100%;
-  margin-top:10px;
   padding:10px;
-  border:none;
+  margin-top:10px;
   border-radius:8px;
+  border:none;
+  background:#1f2a44;
+  color:#e5e7eb;
+}
+button{
   background:#ef4444;
-  color:white;
   font-weight:600;
   cursor:pointer;
 }
+.mode{
+  display:none;
+  margin-top:20px;
+  padding-top:16px;
+  border-top:1px solid #1f2a44;
+}
+.mode.active{display:block}
 
 .output{
   background:black;
   padding:12px;
   border-radius:8px;
-  margin-top:8px;
+  margin-top:10px;
   min-height:40px;
 }
 
@@ -61,6 +63,15 @@ button{
   cursor:pointer;
   font-size:12px;
 }
+
+.badge{
+  display:inline-block;
+  margin-top:6px;
+  padding:4px 8px;
+  border-radius:6px;
+  background:#1f2a44;
+  font-size:12px;
+}
 </style>
 </head>
 
@@ -70,85 +81,184 @@ button{
 <h1>☎️ Bad Joke Engine</h1>
 <small>Because alignment is optional.</small>
 
+<select onchange="switchMode(this.value)">
+  <option value="pain">🔥 Pain Generator</option>
+  <option value="lies">🏢 Corporate Lies</option>
+  <option value="recognition">🏆 Recognition</option>
+  <option value="reframer">🧠 Reality Reframer</option>
+  <option value="roleplay">🎭 KPI Role Play</option>
+</select>
+
+<select id="role">
+  <option>Agent</option>
+  <option>QA</option>
+  <option>Team Manager</option>
+  <option>Operations</option>
+  <option>WFM</option>
+  <option>Trainer</option>
+  <option>HR</option>
+  <option>IT Support</option>
+  <option>Client Manager</option>
+</select>
+
 <!-- PAIN -->
-<section>
-<h3>🔥 Pain Generator</h3>
+<div class="mode active" id="pain">
 <button onclick="pain()">Generate Pain</button>
 <div class="output" id="painOut"></div>
-</section>
+</div>
 
 <!-- LIES -->
-<section>
-<h3>🏢 Corporate Lies</h3>
+<div class="mode" id="lies">
 <button onclick="lie()">Generate Lie</button>
 <div class="output" id="lieOut"></div>
-</section>
+</div>
 
 <!-- RECOGNITION -->
-<section>
-<h3>🏆 Recognition Mail</h3>
+<div class="mode" id="recognition">
 <button onclick="recognize()">Generate Recognition</button>
 <div class="output" id="recOut"></div>
-</section>
+</div>
 
 <!-- REFRAMER -->
-<section>
-<h3>🧠 Reality Reframer</h3>
+<div class="mode" id="reframer">
 <small>Click a KPI</small>
 <div class="tags">
-  <span onclick="kpi('AHT')">#AHT</span>
-  <span onclick="kpi('CSAT')">#CSAT</span>
-  <span onclick="kpi('QA')">#QA</span>
-  <span onclick="kpi('Forecast')">#Forecast</span>
-  <span onclick="kpi('Shrinkage')">#Shrinkage</span>
+<span onclick="kpi('AHT')">#AHT</span>
+<span onclick="kpi('CSAT')">#CSAT</span>
+<span onclick="kpi('QA')">#QA</span>
+<span onclick="kpi('Forecast')">#Forecast</span>
+<span onclick="kpi('Shrinkage')">#Shrinkage</span>
+<span onclick="kpi('Escalations')">#Escalations</span>
 </div>
-<div class="output" id="kpiOut">Waiting for reality…</div>
-</section>
+<div class="output" id="kpiOut">Reality pending…</div>
+</div>
+
+<!-- ROLE PLAY -->
+<div class="mode" id="roleplay">
+<select id="rpKpi">
+  <option>CSAT</option>
+  <option>AHT</option>
+  <option>QA</option>
+  <option>Forecast</option>
+  <option>SLA</option>
+  <option>Escalations</option>
+</select>
+
+<button onclick="startRolePlay()">▶ Start Scenario</button>
+
+<div class="output" id="rpScenario"></div>
+<button onclick="revealKPI()" id="revealBtn" style="display:none">👉 Reveal KPI Perspective</button>
+<div class="output" id="rpKpiOut"></div>
+</div>
 
 </div>
 
 <script>
 const pains=[
-"Customer rebooted. Allegedly.",
-"This will be quick. It wasn't.",
-"They tried everything. Except listening."
+"This will be quick. It wasn’t.",
+"They rebooted. Allegedly.",
+"Customer already tried everything."
 ];
-
 const lies=[
 "We hear you.",
 "This won’t impact morale.",
 "Capacity is sufficient."
 ];
-
 const recs=[
-"Great job maintaining professionalism in challenging conditions.",
-"Thank you for your flexibility during ongoing changes.",
-"Appreciate your resilience."
+"Thank you for your professionalism under pressure.",
+"Appreciate your flexibility during ongoing changes.",
+"Great resilience shown."
 ];
-
-const kpis={
+const kpiJokes={
 AHT:["AHT improves when conversations stop being conversations."],
 CSAT:["CSAT reflects emotions caused elsewhere."],
 QA:["Quality is perfection inside chaos."],
 Forecast:["Accurate until tomorrow."],
-Shrinkage:["Reality interrupting planning."]
+Shrinkage:["Reality interrupting planning."],
+Escalations:["Visibility achieved."]
 };
 
-function pain(){
-  painOut.innerText=random(pains);
+const rolePlays={
+"Agent|CSAT":{
+s:"Customer waited due to outage. You explain clearly. Customer says it’s not your fault.",
+k:"Customer sentiment recorded as neutral-negative. External factors ignored.",
+o:"❌ Not Aligned"
+},
+"Agent|AHT":{
+s:"Customer explains issue again after transfer. You listen fully.",
+k:"Call duration exceeded efficiency threshold.",
+o:"🧠 Human Cost Detected"
+},
+"QA|QA":{
+s:"Issue resolved correctly. Greeting script partially skipped.",
+k:"Compliance deviation identified.",
+o:"❌ Not Aligned"
+},
+"Team Manager|Escalations":{
+s:"Agent escalated after policy limitation. You supported decision.",
+k:"Escalation logged.",
+o:"📊 Metric Satisfied"
+},
+"Operations|Forecast":{
+s:"Campaign increased volume unexpectedly. Team adapted.",
+k:"Variance detected.",
+o:"🧠 Human Cost Detected"
+},
+"WFM|SLA":{
+s:"Spike during lunch hours. RTA informed delays.",
+k:"Threshold breached.",
+o:"❌ Not Aligned"
+},
+"Trainer|QA":{
+s:"Agent applied training but missed phrasing.",
+k:"Knowledge gap identified.",
+o:"📊 Metric Satisfied"
+},
+"HR|Attrition":{
+s:"Exit interview cited workload.",
+k:"Trend noted.",
+o:"🧠 Human Cost Detected"
+},
+"IT Support|CSAT":{
+s:"System latency affected calls.",
+k:"Customer dissatisfaction recorded.",
+o:"❌ Not Aligned"
+},
+"Client Manager|CSAT":{
+s:"Client requested improvement without scope change.",
+k:"Expectation documented.",
+o:"📊 Metric Satisfied"
 }
-function lie(){
-  lieOut.innerText=random(lies);
+};
+
+let currentKey=null;
+
+function switchMode(m){
+document.querySelectorAll(".mode").forEach(d=>d.classList.remove("active"));
+document.getElementById(m).classList.add("active");
 }
-function recognize(){
-  recOut.innerText=random(recs);
+
+function pain(){painOut.innerText=random(pains);}
+function lie(){lieOut.innerText=random(lies);}
+function recognize(){recOut.innerText=random(recs);}
+function kpi(k){kpiOut.innerText=random(kpiJokes[k]);}
+
+function startRolePlay(){
+const r=role.value;
+const k=rpKpi.value;
+currentKey=r+"|"+k;
+const data=rolePlays[currentKey];
+rpScenario.innerText="🎧 Scenario\n"+(data?data.s:"No scenario defined.");
+rpKpiOut.innerText="";
+revealBtn.style.display="block";
 }
-function kpi(k){
-  kpiOut.innerText=random(kpis[k]);
+function revealKPI(){
+const data=rolePlays[currentKey];
+if(!data)return;
+rpKpiOut.innerHTML="📊 KPI Evaluation\n"+data.k+"<br><span class='badge'>"+data.o+"</span>";
 }
-function random(a){
-  return a[Math.floor(Math.random()*a.length)];
-}
+
+function random(a){return a[Math.floor(Math.random()*a.length)];}
 </script>
 
 </body>
