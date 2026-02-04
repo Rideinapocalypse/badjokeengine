@@ -16,7 +16,7 @@ body{
   padding:40px;
 }
 .card{
-  width:440px;
+  width:460px;
   background:#0c142b;
   border-radius:16px;
   padding:22px;
@@ -38,6 +38,7 @@ button{
   font-weight:600;
   cursor:pointer;
 }
+
 .mode{
   display:none;
   margin-top:20px;
@@ -52,6 +53,7 @@ button{
   border-radius:8px;
   margin-top:10px;
   min-height:40px;
+  white-space:pre-line;
 }
 
 .tags span{
@@ -66,11 +68,34 @@ button{
 
 .badge{
   display:inline-block;
-  margin-top:6px;
-  padding:4px 8px;
+  margin-top:8px;
+  padding:6px 10px;
   border-radius:6px;
   background:#1f2a44;
   font-size:12px;
+}
+
+.choice{
+  background:#1f2a44;
+  padding:10px;
+  border-radius:8px;
+  margin-top:8px;
+  cursor:pointer;
+}
+.choice small{
+  display:block;
+  color:#9ca3af;
+  margin-top:4px;
+  font-size:11px;
+}
+
+.toggle{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:12px;
+  margin-top:10px;
+  color:#9ca3af;
 }
 </style>
 </head>
@@ -87,6 +112,7 @@ button{
   <option value="recognition">🏆 Recognition</option>
   <option value="reframer">🧠 Reality Reframer</option>
   <option value="roleplay">🎭 KPI Role Play</option>
+  <option value="angry">😡 Angry Customer Simulator</option>
 </select>
 
 <select id="role">
@@ -143,17 +169,32 @@ button{
   <option>SLA</option>
   <option>Escalations</option>
 </select>
-
 <button onclick="startRolePlay()">▶ Start Scenario</button>
-
 <div class="output" id="rpScenario"></div>
 <button onclick="revealKPI()" id="revealBtn" style="display:none">👉 Reveal KPI Perspective</button>
 <div class="output" id="rpKpiOut"></div>
 </div>
 
+<!-- ANGRY CUSTOMER -->
+<div class="mode" id="angry">
+<small>😡 Angry Customer Simulator<br>“Choose wisely. Metrics are watching.”</small>
+
+<div class="toggle">
+  <input type="checkbox" id="lensToggle">
+  <label for="lensToggle">Show KPI lens</label>
+</div>
+
+<div class="output" id="angryText"></div>
+
+<div id="choices"></div>
+
+<div class="output" id="angryResult"></div>
+</div>
+
 </div>
 
 <script>
+/* ---------- BASIC MODES ---------- */
 const pains=[
 "This will be quick. It wasn’t.",
 "They rebooted. Allegedly.",
@@ -178,64 +219,10 @@ Shrinkage:["Reality interrupting planning."],
 Escalations:["Visibility achieved."]
 };
 
-const rolePlays={
-"Agent|CSAT":{
-s:"Customer waited due to outage. You explain clearly. Customer says it’s not your fault.",
-k:"Customer sentiment recorded as neutral-negative. External factors ignored.",
-o:"❌ Not Aligned"
-},
-"Agent|AHT":{
-s:"Customer explains issue again after transfer. You listen fully.",
-k:"Call duration exceeded efficiency threshold.",
-o:"🧠 Human Cost Detected"
-},
-"QA|QA":{
-s:"Issue resolved correctly. Greeting script partially skipped.",
-k:"Compliance deviation identified.",
-o:"❌ Not Aligned"
-},
-"Team Manager|Escalations":{
-s:"Agent escalated after policy limitation. You supported decision.",
-k:"Escalation logged.",
-o:"📊 Metric Satisfied"
-},
-"Operations|Forecast":{
-s:"Campaign increased volume unexpectedly. Team adapted.",
-k:"Variance detected.",
-o:"🧠 Human Cost Detected"
-},
-"WFM|SLA":{
-s:"Spike during lunch hours. RTA informed delays.",
-k:"Threshold breached.",
-o:"❌ Not Aligned"
-},
-"Trainer|QA":{
-s:"Agent applied training but missed phrasing.",
-k:"Knowledge gap identified.",
-o:"📊 Metric Satisfied"
-},
-"HR|Attrition":{
-s:"Exit interview cited workload.",
-k:"Trend noted.",
-o:"🧠 Human Cost Detected"
-},
-"IT Support|CSAT":{
-s:"System latency affected calls.",
-k:"Customer dissatisfaction recorded.",
-o:"❌ Not Aligned"
-},
-"Client Manager|CSAT":{
-s:"Client requested improvement without scope change.",
-k:"Expectation documented.",
-o:"📊 Metric Satisfied"
-}
-};
-
-let currentKey=null;
-
 function switchMode(m){
 document.querySelectorAll(".mode").forEach(d=>d.classList.remove("active"));
 document.getElementById(m).classList.add("active");
+if(m==="angry") startAngry();
 }
 
 function pain(){painOut.innerText=random(pains);}
@@ -243,6 +230,15 @@ function lie(){lieOut.innerText=random(lies);}
 function recognize(){recOut.innerText=random(recs);}
 function kpi(k){kpiOut.innerText=random(kpiJokes[k]);}
 
+/* ---------- ROLE PLAY ---------- */
+const rolePlays={
+"Agent|CSAT":{
+s:"Customer waited due to outage. You explain clearly. Customer says it’s not your fault.",
+k:"Customer sentiment recorded as neutral-negative. External factors ignored.",
+o:"❌ Not Aligned"
+}
+};
+let currentKey=null;
 function startRolePlay(){
 const r=role.value;
 const k=rpKpi.value;
@@ -255,7 +251,68 @@ revealBtn.style.display="block";
 function revealKPI(){
 const data=rolePlays[currentKey];
 if(!data)return;
-rpKpiOut.innerHTML="📊 KPI Evaluation\n"+data.k+"<br><span class='badge'>"+data.o+"</span>";
+rpKpiOut.innerHTML="📊 KPI Evaluation\n"+data.k+"\n\n"+data.o;
+}
+
+/* ---------- ANGRY CUSTOMER SIMULATOR ---------- */
+let angryStep=1;
+
+function startAngry(){
+angryStep=1;
+angryResult.innerText="";
+angryText.innerText=
+"I’VE BEEN ON HOLD FOREVER.\nNOBODY KNOWS WHAT THEY’RE DOING.\nTHIS IS UNACCEPTABLE.";
+renderChoices([
+{t:"I understand how frustrating this is and I’ll help you.",h:"Empathy",n:"Customer scoffs but listens."},
+{t:"Please calm down so I can assist you.",h:"Control",n:"Customer becomes more hostile."},
+{t:"There is a known outage causing delays.",h:"Efficiency",n:"Customer feels dismissed."},
+{t:"I’ll escalate this to a supervisor.",h:"Escalation",n:"Customer demands escalation."}
+]);
+}
+
+function renderChoices(arr){
+choices.innerHTML="";
+arr.forEach((c,i)=>{
+const d=document.createElement("div");
+d.className="choice";
+d.innerText=c.t;
+if(lensToggle.checked){
+const s=document.createElement("small");
+s.innerText=c.h;
+d.appendChild(s);
+}
+d.onclick=()=>nextAngry(c);
+choices.appendChild(d);
+});
+}
+
+function nextAngry(choice){
+if(angryStep===1){
+angryText.innerText=choice.n;
+angryStep=2;
+renderChoices([
+{t:"I’m really trying to resolve this for you.",h:"Empathy",n:"Customer calms slightly."},
+{t:"This is the fastest available option.",h:"Efficiency",n:"Customer remains upset."},
+{t:"I will transfer you now.",h:"Escalation",n:"Supervisor takes over."}
+]);
+}else{
+endAngry(choice.h);
+}
+}
+
+function endAngry(type){
+choices.innerHTML="";
+let result="";
+if(type==="Empathy"){
+result="😡 Customer: Still unhappy but heard.\n📊 CSAT: ❌ Not Aligned\nAHT: 🧠 Human Cost Detected\n\n🧠 Human Cost Detected";
+}
+if(type==="Efficiency"){
+result="😡 Customer: Dissatisfied.\n📊 AHT: 📊 Metric Satisfied\nCSAT: ❌ Not Aligned\n\n📊 Metric Satisfied";
+}
+if(type==="Escalation"){
+result="😡 Customer: Removed from line.\n📊 Escalations: ❌ Increased\nAHT: 📊 Metric Satisfied\n\n❌ Not Aligned";
+}
+angryResult.innerText=result;
 }
 
 function random(a){return a[Math.floor(Math.random()*a.length)];}
